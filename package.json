@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "REST API Boilerplate with Node JS, TypeScript, Express and Prisma",
   "main": "src/index.ts",
-  "repository": "https://github.com/antonio-lazaro/prisma-express-typescript-boilerplate.git",
   "scripts": {
     "start": "yarn build && pm2 start ecosystem.config.json --no-daemon",
     "dev": "cross-env NODE_ENV=development nodemon src/index.ts",
@@ -43,7 +42,7 @@
     "eslint",
     "prettier"
   ],
-  "author": "Antonio Lázaro",
+  "author": "devsanjithm",
   "license": "ISC",
   "devDependencies": {
     "@faker-js/faker": "^7.6.0",
