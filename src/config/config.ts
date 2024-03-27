@@ -31,7 +31,8 @@ const envVarsSchema = Joi.object()
     AWS_BUCKETNAME: Joi.string().description('AWS bucket Name'),
     AWS_BUCKETREGION: Joi.string().description('AWS Bucket region'),
     AWS_BUCKET_ACCESS_KEY: Joi.string().description('AWS Bucket Access Key'),
-    AWS_BUCKET_SECRET_KEY: Joi.string().description('AWS Bucket Secret key')
+    AWS_BUCKET_SECRET_KEY: Joi.string().description('AWS Bucket Secret key'),
+    REDIS_URL: Joi.string().description('Redis Url')
   })
   .unknown();
 
@@ -73,5 +74,22 @@ export default {
     bucketRegion: envVars.AWS_BUCKETREGION,
     bucketAccessKey: envVars.AWS_BUCKET_ACCESS_KEY,
     bucketSecretKey: envVars.AWS_BUCKET_SECRET_KEY
+  },
+  redis: {
+    url: envVars.REDIS_URL
+  },
+  bullmq: {
+    connector: {
+      host: 'localhost',
+      port: 6379
+    },
+    DEFAULT_REMOVE_CONFIG: {
+      removeOnComplete: {
+        age: 3600
+      },
+      removeOnFail: {
+        age: 24 * 3600
+      }
+    }
   }
 };

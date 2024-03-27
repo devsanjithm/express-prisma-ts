@@ -1,4 +1,3 @@
-import { Role } from '@prisma/client';
 import Joi from 'joi';
 import { password } from './custom.validation';
 
@@ -6,8 +5,7 @@ const createUser = {
   body: Joi.object().keys({
     email_address: Joi.string().required().email(),
     password: Joi.string().required().custom(password),
-    name: Joi.string().required(),
-    role: Joi.string().required().valid(Role.USER, Role.ADMIN)
+    username: Joi.string().required()
   })
 };
 
@@ -23,13 +21,13 @@ const getUsers = {
 
 const getUser = {
   params: Joi.object().keys({
-    userId: Joi.number().integer()
+    user_id: Joi.number().integer()
   })
 };
 
 const updateUser = {
   params: Joi.object().keys({
-    userId: Joi.number().integer()
+    user_id: Joi.number().integer()
   }),
   body: Joi.object()
     .keys({
@@ -42,7 +40,7 @@ const updateUser = {
 
 const deleteUser = {
   params: Joi.object().keys({
-    userId: Joi.number().integer()
+    user_id: Joi.string()
   })
 };
 

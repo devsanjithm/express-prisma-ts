@@ -7,3 +7,8 @@ export interface AuthTokensResponse {
   access: TokenResponse;
   refresh?: TokenResponse;
 }
+
+export interface ResponseObject {
+  status: boolean;
+  data?: object | null;
+}

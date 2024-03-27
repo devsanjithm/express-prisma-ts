@@ -10,7 +10,7 @@ import { AuthTokensResponse } from '../types/response';
 
 /**
  * Generate token
- * @param {number} userId
+ * @param {number} user_id
  * @param {Moment} expires
  * @param {string} type
  * @param {string} [secret]
@@ -20,7 +20,7 @@ const generateToken = (
   user_id: string,
   expires: Moment,
   type: TokenType,
-  secret = config.jwt.secret
+  secret: string = config.jwt.secret
 ): string => {
   const payload = {
     sub: user_id,
@@ -34,7 +34,7 @@ const generateToken = (
 /**
  * Save a token
  * @param {string} token
- * @param {number} userId
+ * @param {number} user_id
  * @param {Moment} expires
  * @param {string} type
  * @param {boolean} [blacklisted]
@@ -44,14 +44,14 @@ const saveToken = async (
   token: string,
   user_id: string,
   expires: Moment,
-  type: TokenType,
+  type: TokenType
 ): Promise<tokens> => {
   const createdToken = prisma.tokens.create({
     data: {
       token,
       user_id: user_id,
       expires: expires.toDate(),
-      type,
+      type
     }
   });
   return createdToken;
@@ -111,7 +111,11 @@ const generateResetPasswordToken = async (email_address: string): Promise<string
     throw new ApiError(httpStatus.NOT_FOUND, 'No users found with this email');
   }
   const expires = moment().add(config.jwt.resetPasswordExpirationMinutes, 'minutes');
-  const resetPasswordToken = generateToken(user.user_id as string, expires, TokenType.RESET_PASSWORD);
+  const resetPasswordToken = generateToken(
+    user.user_id as string,
+    expires,
+    TokenType.RESET_PASSWORD
+  );
   await saveToken(resetPasswordToken, user.user_id as string, expires, TokenType.RESET_PASSWORD);
   return resetPasswordToken;
 };
@@ -124,7 +128,7 @@ const generateResetPasswordToken = async (email_address: string): Promise<string
 const generateVerifyEmailToken = async (user: { user_id: string }): Promise<string> => {
   const expires = moment().add(config.jwt.verifyEmailExpirationMinutes, 'minutes');
   const verifyEmailToken = generateToken(user.user_id, expires, TokenType.VERIFY_EMAIL);
-  await saveToken(verifyEmailToken, user.user_id,expires, TokenType.VERIFY_EMAIL);
+  await saveToken(verifyEmailToken, user.user_id, expires, TokenType.VERIFY_EMAIL);
   return verifyEmailToken;
 };
 

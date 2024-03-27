@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const fileUpload = catchAsync(async (req, res) => {
   if (req.files?.length) throw new ApiError(httpStatus.BAD_REQUEST, 'Image need to be selected');
-  let results = await s3CreateObject(req.files, `${uuidv4()}`);
+  const results = await s3CreateObject(req.files, `${uuidv4()}`);
   return res.send({ imageurl: results });
 });
 
