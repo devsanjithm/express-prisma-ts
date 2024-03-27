@@ -20,11 +20,7 @@ const PrismaActionTypes = [
   'groupBy'
 ];
 
-const PrismaFindAction = [
-  'findMany',
-  'findFirst',
-  'findFirstOrThrow'
-];
+const PrismaFindAction = ['findMany', 'findFirst', 'findFirstOrThrow'];
 
 const PrismaCreateAction = ['create', 'createMany'];
 

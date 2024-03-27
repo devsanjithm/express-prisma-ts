@@ -13,7 +13,7 @@ const s3Config = new AWS.S3({
   secretAccessKey: config.aws.bucketSecretKey,
   region: config.aws.bucketRegion
 });
-
+// eslint-disable-next-line
 const fileFilter = (req: Express.Request, file: any, cb: Function) => {
   if (!file) {
     cb(new Error('File is required'), false);
@@ -54,9 +54,9 @@ export const s3CreateObject = async (files: any, fileName: string) => {
 };
 
 export const s3DeleteObject = async (file: string) => {
-  var param = { Bucket: config.aws.bucketName, Key: file };
+  const param = { Bucket: config.aws.bucketName, Key: file };
   if (file) {
-    var deletePromise = new Promise(async function (resolve, reject) {
+    const deletePromise = new Promise(async function (resolve, reject) {
       s3Config.deleteObject(param, function (err, data) {
         if (err) {
           reject(data);

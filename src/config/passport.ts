@@ -1,7 +1,7 @@
-import prisma from '../client';
 import { Strategy as JwtStrategy, ExtractJwt, VerifyCallback } from 'passport-jwt';
 import config from './config';
 import { TokenType } from '@prisma/client';
+import cacheService from '../services/cache.service';
 
 const jwtOptions = {
   secretOrKey: config.jwt.secret,
@@ -13,18 +13,11 @@ const jwtVerify: VerifyCallback = async (payload, done) => {
     if (payload.type !== TokenType.ACCESS) {
       throw new Error('Invalid token type');
     }
-    const user = await prisma.users.findUnique({
-      select: {
-        id: true,
-        email_address: true,
-        first_name: true
-      },
-      where: { user_id: payload.sub }
-    });
-    if (!user) {
+    const redisCachedUser = await cacheService.getFromCache(payload.sub);
+    if (!redisCachedUser) {
       return done(null, false);
     }
-    done(null, user);
+    done(null, redisCachedUser);
   } catch (error) {
     done(error, false);
   }

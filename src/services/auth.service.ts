@@ -18,22 +18,11 @@ const loginUserWithEmailAndPassword = async (
   email_address: string,
   password: string
 ): Promise<Omit<users, 'password' | 'id' | 'is_active' | 'deletedAt'>> => {
-  const user = await userService.getUserByEmail(email_address, [
-    'user_id',
-    'email_address',
-    'first_name',
-    'last_name',
-    'mobile_number',
-    'password',
-    'roles',
-    'isEmailVerified',
-    'createdAt',
-    'updatedAt'
-  ]);
+  const user = await userService.getUserByEmail(email_address);
   if (!user || !(await isPasswordMatch(password, user.password as string))) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
   }
-  return exclude(user,['password']);
+  return exclude(user, ['password']);
 };
 
 /**
@@ -45,7 +34,7 @@ const logout = async (refreshToken: string): Promise<void> => {
   const refreshTokenData = await prisma.tokens.findFirst({
     where: {
       token: refreshToken,
-      type: TokenType.REFRESH,
+      type: TokenType.REFRESH
     }
   });
   if (!refreshTokenData) {
@@ -88,7 +77,9 @@ const resetPassword = async (resetPasswordToken: string, newPassword: string): P
     }
     const encryptedPassword = await encryptPassword(newPassword);
     await userService.updateUserById(user.user_id, { password: encryptedPassword });
-    await prisma.tokens.deleteMany({ where: { user_id: user.user_id, type: TokenType.RESET_PASSWORD } });
+    await prisma.tokens.deleteMany({
+      where: { user_id: user.user_id, type: TokenType.RESET_PASSWORD }
+    });
   } catch (error) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Password reset failed');
   }

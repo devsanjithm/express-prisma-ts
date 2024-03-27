@@ -12,8 +12,7 @@ import { authLimiter } from './middlewares/rateLimiter';
 import routes from './routes/v1';
 import { errorConverter, errorHandler } from './middlewares/error';
 import ApiError from './utils/ApiError';
-import fetchOnlyActive from './middlewares/fetchOnlyActive.prisma';
-import prisma from './client';
+import cronJobs from './services/cron.service';
 
 const app = express();
 
@@ -22,8 +21,8 @@ if (config.env !== 'test') {
   app.use(morgan.errorHandler);
 }
 
-// Prisma middleware to fetch only the active records
-prisma.$use(fetchOnlyActive);
+// Cron
+cronJobs();
 
 // set security HTTP headers
 app.use(helmet());
