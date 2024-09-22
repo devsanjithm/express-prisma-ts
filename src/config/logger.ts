@@ -8,14 +8,6 @@ const enumerateErrorFormat = winston.format((info) => {
   return info;
 });
 
-const errorFilter = winston.format((info) => {
-  return info.level === 'error' ? info : false;
-});
-
-const infoFilter = winston.format((info) => {
-  return info.level === 'info' ? info : false;
-});
-
 const logger = winston.createLogger({
   level: config.env === 'development' ? 'debug' : 'info',
   format: winston.format.combine(
@@ -33,24 +25,6 @@ const logger = winston.createLogger({
     }),
     new winston.transports.File({
       filename: 'combined.log'
-    }),
-    new winston.transports.File({
-      filename: 'app-error.log',
-      level: 'error',
-      format: winston.format.combine(
-        errorFilter(),
-        winston.format.timestamp(),
-        winston.format.json()
-      )
-    }),
-    new winston.transports.File({
-      filename: 'app-info.log',
-      level: 'info',
-      format: winston.format.combine(
-        infoFilter(),
-        winston.format.timestamp(),
-        winston.format.json()
-      )
     })
   ]
 });
