@@ -1,25 +1,31 @@
-import { Server } from 'http';
-import app from './app';
-import prisma from './client';
-import config from './config/config';
-import logger from './config/logger';
+import { type Server } from 'node:http';
+import { exit } from 'node:process';
+import app from './app.js';
+import prisma from './client.js';
+import config from './config/config.js';
+import logger from './config/logger.js';
 
 let server: Server;
-prisma.$connect().then(() => {
-  logger.info('Connected to SQL Database');
-  server = app.listen(config.port, () => {
-    logger.info(`Listening to port ${config.port}`);
+prisma
+  .$connect()
+  .then(() => {
+    logger.info('Connected to SQL Database');
+    server = app.listen(config.port, () => {
+      logger.info(`Listening to port ${config.port}`);
+    });
+  })
+  .catch((error) => {
+    logger.error(error);
   });
-});
 
 const exitHandler = () => {
   if (server) {
     server.close(() => {
       logger.info('Server closed');
-      process.exit(1);
+      exit(1);
     });
   } else {
-    process.exit(1);
+    exit(1);
   }
 };
 

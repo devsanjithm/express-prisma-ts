@@ -1,6 +1,6 @@
 import express from 'express';
-import deleteExpiredItems from '../../services/softDelete.service';
-import responseHandler from '../../utils/response';
+import deleteExpiredItems from '../../services/softDelete.service.js';
+import responseHandler from '../../utils/response.js';
 
 const router = express.Router();
 

@@ -1,17 +1,18 @@
-import { Response } from 'express-serve-static-core';
+import { type Response } from 'express-serve-static-core';
 import httpStatus from 'http-status';
-import { ResponseObject } from '../types/response';
+import { type ResponseObject } from '../types/response.js';
 
-const responseHandler = (
-  res: Response<any, Record<string, any>, number>,
-  obj?: object | null,
-  status?: number
-) => {
+const responseHandler = (response: Response, object?: any, status?: number) => {
+  const finalStatus = status ?? httpStatus.OK;
   const responseObject: ResponseObject = {
-    status: true
+    status: finalStatus >= 200 && finalStatus < 300 // Status is true for 2xx codes.
   };
-  if (obj) responseObject['data'] = obj;
-  return res.status(status ?? httpStatus.OK).send(responseObject);
+
+  if (object) {
+    responseObject.data = object; // eslint-disable-line @typescript-eslint/no-unsafe-assignment
+  }
+
+  return response.status(finalStatus).send(responseObject);
 };
 
 export default responseHandler;

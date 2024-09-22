@@ -4,11 +4,14 @@
  * @param keys
  * @returns
  */
-const exclude = <Type, Key extends keyof Type>(obj: Type, keys: Key[]): Omit<Type, Key> => {
-  for (const key of keys) {
-    delete obj[key];
+const exclude = <Type, Key extends keyof Type>(object: Type, keys: Key[]): Omit<Type, Key> => {
+  if (object) {
+    for (const key of keys) {
+      delete object[key];
+    }
+    return object;
   }
-  return obj;
+  return object;
 };
 
 export default exclude;

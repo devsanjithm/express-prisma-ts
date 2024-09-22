@@ -1,8 +1,8 @@
 import nodemailer from 'nodemailer';
-import config from '../config/config';
-import logger from '../config/logger';
+import config from '../config/config.js';
+import logger from '../config/logger.js';
 
-const transport = nodemailer.createTransport(config.email.smtp);
+export const transport = nodemailer.createTransport(config.email.smtp);
 /* istanbul ignore next */
 if (config.env !== 'test' && config.features.email_SMTP) {
   transport
@@ -22,9 +22,14 @@ if (config.env !== 'test' && config.features.email_SMTP) {
  * @param {string} text
  * @returns {Promise}
  */
-const sendEmail = async (to: string, subject: string, text: string) => {
-  const msg = { from: config.email.from, to, subject, text };
-  await transport.sendMail(msg);
+export const sendEmail = async (to: string, subject: string, text: string) => {
+  const message = {
+    from: config.email.from,
+    to,
+    subject,
+    text
+  };
+  await transport.sendMail(message);
 };
 
 /**
@@ -33,9 +38,9 @@ const sendEmail = async (to: string, subject: string, text: string) => {
  * @param {string} token
  * @returns {Promise}
  */
-const sendResetPasswordEmail = async (to: string, token: string) => {
+export const sendResetPasswordEmail = async (to: string, token: string) => {
   const subject = 'Reset password';
-  // replace this url with the link to the reset password page of your front-end app
+  // Replace this url with the link to the reset password page of your front-end app
   const resetPasswordUrl = `http://link-to-app/reset-password?token=${token}`;
   const text = `Dear user,
 To reset your password, click on this link: ${resetPasswordUrl}
@@ -49,18 +54,11 @@ If you did not request any password resets, then ignore this email.`;
  * @param {string} token
  * @returns {Promise}
  */
-const sendVerificationEmail = async (to: string, token: string) => {
+export const sendVerificationEmail = async (to: string, token: string) => {
   const subject = 'Email Verification';
-  // replace this url with the link to the email verification page of your front-end app
+  // Replace this url with the link to the email verification page of your front-end app
   const verificationEmailUrl = `http://link-to-app/verify-email?token=${token}`;
   const text = `Dear user,
 To verify your email, click on this link: ${verificationEmailUrl}`;
   await sendEmail(to, subject, text);
-};
-
-export default {
-  transport,
-  sendEmail,
-  sendResetPasswordEmail,
-  sendVerificationEmail
 };

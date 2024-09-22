@@ -1,9 +1,5 @@
 import Joi from 'joi';
 
-const fileUpload = {
+export const fileUpload = {
   file: Joi.any().required()
-};
-
-export default {
-  fileUpload
 };

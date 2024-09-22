@@ -1,14 +1,14 @@
-export interface TokenResponse {
+export type TokenResponse = {
   token: string;
   expires: Date;
-}
+};
 
-export interface AuthTokensResponse {
+export type AuthTokensResponse = {
   access: TokenResponse;
   refresh?: TokenResponse;
-}
+};
 
-export interface ResponseObject {
+export type ResponseObject = {
   status: boolean;
-  data?: object | null;
-}
+  data?: Record<string, unknown> | undefined;
+};

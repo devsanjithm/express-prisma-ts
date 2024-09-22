@@ -1,40 +1,50 @@
 import Joi from 'joi';
-import { password } from './custom.validation';
+import { password } from './custom.validation.js';
 
-const register = {
+export const register = {
   body: Joi.object().keys({
     email_address: Joi.string().required().email(),
     password: Joi.string().required().custom(password),
-    username: Joi.string().required()
+    member_name: Joi.string().required(),
+    mobile_no: Joi.string()
+      .regex(/^[1-9][0-9]{7}$/)
+      .messages({ 'string.pattern.base': 'Phone number must have 8 digits.' })
+      .required()
   })
 };
 
-const login = {
+export const login = {
   body: Joi.object().keys({
-    email_address: Joi.string().required(),
-    password: Joi.string().required()
+    mobile_no: Joi.string()
+      .regex(/^[1-9][0-9]{7}$/)
+      .messages({ 'string.pattern.base': 'Phone number must have 8 digits.' })
+      .required(),
+    password: Joi.string().required().custom(password)
   })
 };
 
-const logout = {
+export const logout = {
   body: Joi.object().keys({
     refreshToken: Joi.string().required()
   })
 };
 
-const refreshTokens = {
+export const refreshTokens = {
   body: Joi.object().keys({
     refreshToken: Joi.string().required()
   })
 };
 
-const forgotPassword = {
+export const forgotPassword = {
   body: Joi.object().keys({
-    email_address: Joi.string().email().required()
+    mobile_no: Joi.string()
+      .regex(/^[1-9][0-9]{7}$/)
+      .messages({ 'string.pattern.base': 'Phone number must have 8 digits.' })
+      .required()
   })
 };
 
-const resetPassword = {
+export const resetPassword = {
   query: Joi.object().keys({
     token: Joi.string().required()
   }),
@@ -43,18 +53,14 @@ const resetPassword = {
   })
 };
 
-const verifyEmail = {
+export const verifyEmail = {
   query: Joi.object().keys({
     token: Joi.string().required()
   })
 };
 
-export default {
-  register,
-  login,
-  logout,
-  refreshTokens,
-  forgotPassword,
-  resetPassword,
-  verifyEmail
+export const selectmember = {
+  params: Joi.object().keys({
+    submember_id: Joi.string().required()
+  })
 };

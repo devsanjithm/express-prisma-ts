@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -11,11 +12,10 @@ datasource db {
 }
 
 model tokens {
-  id        Int       @default(autoincrement())
   token_id  String    @id @default(uuid())
   token     String
   user_id   String
-  user      users?    @relation(fields: [user_id], references: [user_id],onDelete: Cascade)
+  user      users?    @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
   expires   DateTime
   type      TokenType
   is_active Boolean   @default(true)
@@ -25,7 +25,6 @@ model tokens {
 }
 
 model users {
-  id              Int       @default(autoincrement())
   user_id         String    @id @default(uuid())
   first_name      String
   last_name       String?
@@ -42,13 +41,21 @@ model users {
 }
 
 model softdeletedItems {
-  id             Int      @default(autoincrement())
   softdeleted_id String   @id @default(uuid())
   item_id        String
   model_name     String
   is_active      Boolean  @default(true)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+}
+
+model otp {
+  otp_id     String   @id @default(uuid())
+  user_id    String
+  mobile_no  String
+  otp        String
+  createdAt  DateTime @default(now())
+  expires_in String
 }
 
 enum Role {

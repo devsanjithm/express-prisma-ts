@@ -1,18 +1,19 @@
 import express from 'express';
-import authRoute from './auth.route';
-import userRoute from './user.route';
-import docsRoute from './docs.route';
-import fileRoute from './fileUpload.route';
-import cronRoute from './cron.route';
-import config from '../../config/config';
+import config from '../../config/config.js';
+// import authRoute from './auth.route.js';
+import cronRoute from './cron.route.js';
+import docsRoute from './docs.route.js';
+import fileRoute from './fileUpload.route.js';
+import otpRoute from './otp.route.js';
+import userRoute from './user.route.js';
 
 const router = express.Router();
 
 const defaultRoutes = [
-  {
-    path: '/auth',
-    route: authRoute
-  },
+  // {
+  //   path: '/auth',
+  //   route: authRoute
+  // },
   {
     path: '/users',
     route: userRoute
@@ -20,6 +21,10 @@ const defaultRoutes = [
   {
     path: '/cron',
     route: cronRoute
+  },
+  {
+    path: '/otp',
+    route: otpRoute
   }
 ];
 
@@ -30,29 +35,29 @@ const fileRoutes = [
   }
 ];
 
-const devRoutes = [
-  // routes available only in development mode
+const developmentRoutes = [
+  // Routes available only in development mode
   {
     path: '/docs',
     route: docsRoute
   }
 ];
 
-defaultRoutes.forEach((route) => {
+for (const route of defaultRoutes) {
   router.use(route.path, route.route);
-});
+}
 
 /* istanbul ignore next */
 if (config.env === 'development') {
-  devRoutes.forEach((route) => {
+  for (const route of developmentRoutes) {
     router.use(route.path, route.route);
-  });
+  }
 }
 
 if (config.features.file) {
-  fileRoutes.forEach((route) => {
+  for (const route of fileRoutes) {
     router.use(route.path, route.route);
-  });
+  }
 }
 
 export default router;

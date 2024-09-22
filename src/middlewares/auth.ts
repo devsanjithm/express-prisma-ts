@@ -1,9 +1,9 @@
 import passport from 'passport';
 import httpStatus from 'http-status';
-import ApiError from '../utils/ApiError';
-import { roleRights } from '../config/roles';
-import { NextFunction, Request, Response } from 'express';
-import { users } from '@prisma/client';
+import { type NextFunction, type Request, type Response } from 'express';
+import { type users } from '@prisma/client';
+import ApiError from '../utils/ApiError.js';
+import { roleRights } from '../config/roles.js';
 
 const verifyCallback =
   (
@@ -12,20 +12,23 @@ const verifyCallback =
     reject: (reason?: unknown) => void,
     requiredRights: string[]
   ) =>
-  async (err: unknown, user: users | false, info: unknown) => {
-    if (err || info || !user) {
-      return reject(new ApiError(httpStatus.UNAUTHORIZED, 'Please authenticate'));
+  async (error: unknown, user: users | false, info: unknown) => {
+    if (error || info || !user) {
+      reject(new ApiError(httpStatus.UNAUTHORIZED, 'Please authenticate'));
+      return;
     }
+
     req.user = user;
 
-    if (requiredRights.length) {
+    if (requiredRights.length > 0) {
       const userRights = roleRights.get(user.roles) ?? [];
       const hasRequiredRights = requiredRights.every((requiredRight) =>
         userRights.includes(requiredRight)
       );
 
-      if (!hasRequiredRights && req.params.userId !== user.id) {
-        return reject(new ApiError(httpStatus.FORBIDDEN, 'Forbidden'));
+      if (!hasRequiredRights && req.params.userId !== user.user_id) {
+        reject(new ApiError(httpStatus.FORBIDDEN, 'Forbidden'));
+        return;
       }
     }
 
@@ -34,16 +37,19 @@ const verifyCallback =
 
 const auth =
   (...requiredRights: string[]) =>
-  async (req: Request, res: Response, next: NextFunction) => {
-    return new Promise((resolve, reject) => {
+  async (req: Request, res: Response, next: NextFunction) =>
+    new Promise((resolve, reject) => {
       passport.authenticate(
         'jwt',
         { session: false },
         verifyCallback(req, resolve, reject, requiredRights)
       )(req, res, next);
     })
-      .then(() => next())
-      .catch((err) => next(err));
-  };
+      .then(() => {
+        next();
+      })
+      .catch((error) => {
+        next(error);
+      });
 
 export default auth;

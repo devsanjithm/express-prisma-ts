@@ -4,27 +4,36 @@ services:
   node-app:
     build: .
     image: node-app
-    environment:
-      - MONGODB_URL=mongodb://mongodb:27017/node-boilerplate
     ports:
-      - '3000:3000'
+      - '5412:5412'
     depends_on:
       - postgresdb
+      - redisCache
     volumes:
       - .:/usr/src/node-app
     networks:
       - node-network
+    env_file:
+      - .env
 
   postgresdb:
-    image: postgres
-    restart: always
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=secret
+    image: postgres:14-alpine
     ports:
-      - '5432:5432'
-    volumes: 
-      - dbdata:/var/lib/postgresql/data
+      - 5432:5432
+    volumes:
+      - ~/apps/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=post123
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=alhayat
+
+    networks:
+      - node-network
+
+  redisCache:
+    image: "redis:alpine"
+    ports:
+      - 6379:6379
     networks:
       - node-network
 

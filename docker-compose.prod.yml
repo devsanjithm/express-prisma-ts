@@ -3,5 +3,5 @@ version: '3.8'
 services:
   node-app:
     container_name: node-app-prod
-    command: yarn start
+    command: sh -c "npx prisma generate && yarn db:push && yarn start"
 

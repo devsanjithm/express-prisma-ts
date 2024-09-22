@@ -1,20 +1,21 @@
-import { Prisma } from '@prisma/client';
+import { type Prisma } from '@prisma/client';
 import httpStatus from 'http-status';
-import prisma from '../client';
-import logger from '../config/logger';
-import ApiError from '../utils/ApiError';
+import prisma from '../client.js';
+import logger from '../config/logger.js';
+import ApiError from '../utils/ApiError.js';
 
-const returnFormatedObject = (arr: Array<{ item_id: string; model_name: string }>) => {
-  const obj: any = {};
-  for (let i = 0; i < arr.length; i++) {
-    const element = arr[i];
+const returnFormatedObject = (array: Array<{ item_id: string; model_name: string }>) => {
+  const object: any = {};
+  for (const element of array) {
     let ids = [element.item_id];
-    if (obj[element.model_name]) {
+    if (object[element.model_name]) {
       ids = [...ids, element.item_id];
     }
-    obj[element.model_name] = ids;
+
+    object[element.model_name] = ids;
   }
-  return obj;
+
+  return object;
 };
 
 const deleteExpiredItems = async () => {
@@ -51,8 +52,9 @@ const deleteExpiredItems = async () => {
     await prisma.$transaction(prismaPromise);
     logger.info('Deleted Soft Items done successfully');
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     throw new ApiError(httpStatus.SERVICE_UNAVAILABLE, JSON.stringify(error));
   }
 };
+
 export default deleteExpiredItems;

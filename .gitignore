@@ -19,3 +19,6 @@ db
 
 # TypeScript
 build
+yarn.lock
+*.log
+*.lock

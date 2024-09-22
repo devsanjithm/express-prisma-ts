@@ -1,17 +1,13 @@
+version: '3.9'
 
-version: '3.8'
 services:
-  db:
-    image: postgres
-    restart: always
-    container_name: postgresdb-util-dev
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=secret
+  postgres:
+    image: postgres:14-alpine
     ports:
-      - '5432:5432'
-    volumes: 
-      - db:/var/lib/postgresql/data
-volumes:
-  db:
-    driver: local
+      - 5432:5432
+    volumes:
+      - ~/apps/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=post123
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=alhayat

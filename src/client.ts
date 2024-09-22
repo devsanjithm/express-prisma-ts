@@ -1,5 +1,6 @@
 import { Prisma, PrismaClient } from '@prisma/client';
-import config from './config/config';
+import config from './config/config.js';
+import { encryptPassword } from './utils/encryption.js';
 
 const xPrisma = new PrismaClient().$extends({
   query: {
@@ -14,9 +15,22 @@ const xPrisma = new PrismaClient().$extends({
             operation === 'updateMany' ||
             operation === 'upsert' ||
             operation === 'findUniqueOrThrow') &&
-          model !== 'softdeletedItems'
+          model !== 'softdeletedItems' &&
+          model !== 'otp'
         ) {
           args.where = { ...args.where, deletedAt: null, is_active: true };
+        }
+
+        return query(args);
+      }
+    },
+    users: {
+      async $allOperations({ operation, args, query }) {
+        if ((operation === 'create' || operation === 'update') && args.data.password) {
+          args.data = {
+            ...args.data,
+            password: await encryptPassword(args.data.password as string)
+          };
         }
         return query(args);
       }
@@ -52,10 +66,10 @@ const xPrisma = new PrismaClient().$extends({
           }
         });
         const modelId = (context.$name || '').slice(0, -1);
-        alteredQuery.map(async (el: any) => {
+        alteredQuery.map(async (element: any) => {
           await prisma.softdeletedItems.createMany({
             data: {
-              item_id: el[`${modelId}_id`],
+              item_id: element[`${modelId}_id`],
               model_name: context.$name || ''
             }
           });
@@ -68,16 +82,18 @@ const xPrisma = new PrismaClient().$extends({
 
 type extendedPrisma = typeof xPrisma;
 
-// add prisma to the NodeJS global type
-interface CustomNodeJsGlobal extends Global {
+// Add prisma to the NodeJS global type
+type CustomNodeJsGlobal = {
   prisma: extendedPrisma;
-}
+} & Global;
 
 // Prevent multiple instances of Prisma Client in development
 declare const global: CustomNodeJsGlobal;
 
 const prisma = global.prisma || xPrisma;
 
-if (config.env === 'development') global.prisma = prisma;
+if (config.env === 'development') {
+  global.prisma = prisma;
+}
 
 export default prisma;

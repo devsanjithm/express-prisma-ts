@@ -1,56 +1,18 @@
 import express from 'express';
-import validate from '../../middlewares/validate';
-import { fileUploadController } from '../../controllers';
-import auth from '../../middlewares/auth';
-import { fileUploadValidation } from '../../validations';
+import validate from '../../middlewares/validate.js';
+import auth from '../../middlewares/auth.js';
+// import upload from '../../config/fileUpload.azure.js';
+import * as fileUploadValidation from '../../validations/fileUpload.validation.js';
+import * as fileUploadController from '../../controllers/fileUpload.controller.js';
+
 const router = express.Router();
 
 router.post(
   '/upload-file',
   auth('uploadFile'),
+  //   upload.single('file'),
   validate(fileUploadValidation.fileUpload),
   fileUploadController.fileUpload
 );
 
 export default router;
-
-/**
- * @swagger
- * tags:
- *   name: File
- *   description: File Upload
- */
-
-/**
- * @swagger
- * /upload-file:
- *   post:
- *     summary: Used to file upload
- *     tags: [File]
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: File
- *             required:
- *               - file
- *             properties:
- *               file:
- *                 type: File
- *                 format : file
- *                 description : required field to upload a file
- *             example:
- *               file : Array<buffer>
- *     responses:
- *       "201":
- *         description: Created
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ImageURL'
- *       "400":
- *         $ref: '#/components/responses/NotFound'
- *       "401":
- *         $ref: '#/components/responses/Unauthorized'
- */

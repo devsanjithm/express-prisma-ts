@@ -1,7 +1,6 @@
-import { Strategy as JwtStrategy, ExtractJwt, VerifyCallback } from 'passport-jwt';
-import config from './config';
-import { TokenType } from '@prisma/client';
-import cacheService from '../services/cache.service';
+import { Strategy as JwtStrategy, ExtractJwt, type VerifyCallback } from 'passport-jwt';
+import cacheService from '../services/cache.service.js';
+import config from './config.js';
 
 const jwtOptions = {
   secretOrKey: config.jwt.secret,
@@ -10,13 +9,15 @@ const jwtOptions = {
 
 const jwtVerify: VerifyCallback = async (payload, done) => {
   try {
-    if (payload.type !== TokenType.ACCESS) {
-      throw new Error('Invalid token type');
-    }
+    // If (payload.type !== TokenType.ACCESS) {
+    //   throw new Error('Invalid token type');
+    // }
     const redisCachedUser = await cacheService.getFromCache(payload.sub);
     if (!redisCachedUser) {
-      return done(null, false);
+      done(null, false);
+      return;
     }
+
     done(null, redisCachedUser);
   } catch (error) {
     done(error, false);

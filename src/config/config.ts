@@ -1,10 +1,10 @@
+import path from 'node:path';
 import dotenv from 'dotenv';
-import path from 'path';
 import Joi from 'joi';
 
 dotenv.config({ path: path.join(process.cwd(), '.env') });
 
-const envVarsSchema = Joi.object()
+const envVariablesSchema = Joi.object()
   .keys({
     NODE_ENV: Joi.string().valid('production', 'development', 'test').required(),
     PORT: Joi.number().default(3000),
@@ -21,22 +21,18 @@ const envVarsSchema = Joi.object()
     JWT_VERIFY_EMAIL_EXPIRATION_MINUTES: Joi.number()
       .default(10)
       .description('minutes after which verify email token expires'),
-    SMTP_HOST: Joi.string().description('server that will send the emails'),
-    SMTP_PORT: Joi.number().description('port to connect to the email server'),
-    SMTP_USERNAME: Joi.string().description('username for email server'),
-    SMTP_PASSWORD: Joi.string().description('password for email server'),
-    EMAIL_FROM: Joi.string().description('the from field in the emails sent by the app'),
-    EMAIL_ACTIVE: Joi.boolean().description('Email SMTP toggler'),
-    FILE_UPLOAD: Joi.boolean().description('Toggler for file upload'),
-    AWS_BUCKETNAME: Joi.string().description('AWS bucket Name'),
-    AWS_BUCKETREGION: Joi.string().description('AWS Bucket region'),
-    AWS_BUCKET_ACCESS_KEY: Joi.string().description('AWS Bucket Access Key'),
-    AWS_BUCKET_SECRET_KEY: Joi.string().description('AWS Bucket Secret key'),
-    REDIS_URL: Joi.string().description('Redis Url')
+    REDIS_URL: Joi.string().description('Redis Url'),
+    OTP_EXPIRES: Joi.string().description('OTP EXPIREATION TIME').required(),
+    REAUTHENTICATE_EXPIRY_MINUTES: Joi.number()
+      .default(1)
+      .description('minute after reauthenticate token expiries'),
+    SAS_URL: Joi.string().description('Azure sas url'),
+    SAS_TOKEN: Joi.string().description('Azure sas token'),
+    CONTAINER_NAME: Joi.string().description('Azure container name')
   })
   .unknown();
 
-const { value: envVars, error } = envVarsSchema
+const { value: envVariables, error } = envVariablesSchema
   .prefs({ errors: { label: 'key' } })
   .validate(process.env);
 
@@ -45,38 +41,47 @@ if (error) {
 }
 
 export default {
-  env: envVars.NODE_ENV,
-  port: envVars.PORT,
+  env: envVariables.NODE_ENV,
+  port: envVariables.PORT,
   features: {
-    file: envVars.FILE_UPLOAD,
-    email_SMTP: envVars.EMAIL_ACTIVE
+    file: envVariables.FILE_UPLOAD,
+    email_SMTP: envVariables.EMAIL_ACTIVE
+  },
+  otp: {
+    expires_time: envVariables.OTP_EXPIRES
   },
   jwt: {
-    secret: envVars.JWT_SECRET,
-    accessExpirationMinutes: envVars.JWT_ACCESS_EXPIRATION_MINUTES,
-    refreshExpirationDays: envVars.JWT_REFRESH_EXPIRATION_DAYS,
-    resetPasswordExpirationMinutes: envVars.JWT_RESET_PASSWORD_EXPIRATION_MINUTES,
-    verifyEmailExpirationMinutes: envVars.JWT_VERIFY_EMAIL_EXPIRATION_MINUTES
+    secret: envVariables.JWT_SECRET,
+    accessExpirationMinutes: envVariables.JWT_ACCESS_EXPIRATION_MINUTES,
+    refreshExpirationDays: envVariables.JWT_REFRESH_EXPIRATION_DAYS,
+    resetPasswordExpirationMinutes: envVariables.JWT_RESET_PASSWORD_EXPIRATION_MINUTES,
+    verifyEmailExpirationMinutes: envVariables.JWT_VERIFY_EMAIL_EXPIRATION_MINUTES,
+    reauthentiacteExpiryMinutes: envVariables.REAUTHENTICATE_EXPIRY_MINUTES
   },
   email: {
     smtp: {
-      host: envVars.SMTP_HOST,
-      port: envVars.SMTP_PORT,
+      host: envVariables.SMTP_HOST,
+      port: envVariables.SMTP_PORT,
       auth: {
-        user: envVars.SMTP_USERNAME,
-        pass: envVars.SMTP_PASSWORD
+        user: envVariables.SMTP_USERNAME,
+        pass: envVariables.SMTP_PASSWORD
       }
     },
-    from: envVars.EMAIL_FROM
+    from: envVariables.EMAIL_FROM
+  },
+  azure: {
+    sasurl: envVariables.SAS_URL,
+    sastoken: envVariables.SAS_TOKEN,
+    container_name: envVariables.CONTAINER_NAME
   },
   aws: {
-    bucketName: envVars.AWS_BUCKETNAME,
-    bucketRegion: envVars.AWS_BUCKETREGION,
-    bucketAccessKey: envVars.AWS_BUCKET_ACCESS_KEY,
-    bucketSecretKey: envVars.AWS_BUCKET_SECRET_KEY
+    bucketName: envVariables.AWS_BUCKETNAME,
+    bucketRegion: envVariables.AWS_BUCKETREGION,
+    bucketAccessKey: envVariables.AWS_BUCKET_ACCESS_KEY,
+    bucketSecretKey: envVariables.AWS_BUCKET_SECRET_KEY
   },
   redis: {
-    url: envVars.REDIS_URL
+    url: envVariables.REDIS_URL
   },
   bullmq: {
     connector: {

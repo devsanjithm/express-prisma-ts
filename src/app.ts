@@ -1,18 +1,20 @@
-import express from 'express';
-import helmet from 'helmet';
 import compression from 'compression';
 import cors from 'cors';
-import passport from 'passport';
+import express from 'express';
+import helmet from 'helmet';
+import bodyParser from 'body-parser';
 import httpStatus from 'http-status';
-import config from './config/config';
-import morgan from './config/morgan';
-import xss from './middlewares/xss';
-import { jwtStrategy } from './config/passport';
-import { authLimiter } from './middlewares/rateLimiter';
-import routes from './routes/v1';
-import { errorConverter, errorHandler } from './middlewares/error';
-import ApiError from './utils/ApiError';
-import cronJobs from './services/cron.service';
+import passport from 'passport';
+import config from './config/config.js';
+import morgan from './config/morgan.js';
+import { jwtStrategy } from './config/passport.js';
+import { errorConverter, errorHandler } from './middlewares/error.js';
+import { authLimiter } from './middlewares/rateLimiter.js';
+import xss from './middlewares/xss.js';
+import routes from './routes/v1/index.js';
+import cronJobs from './services/cron.service.js';
+import ApiError from './utils/ApiError.js';
+import cacheService from './services/cache.service.js';
 
 const app = express();
 
@@ -22,48 +24,57 @@ if (config.env !== 'test') {
 }
 
 // Cron
-cronJobs();
+if (config.env === 'production') {
+  cronJobs();
+}
 
-// set security HTTP headers
+//redis
+cacheService.createRedisClient();
+
+// Set security HTTP headers
 app.use(helmet());
 
-// parse json request body
+// Parse json request body
 app.use(express.json());
 
-// parse urlencoded request body
-app.use(express.urlencoded({ extended: true }));
+// Parse urlencoded request body
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }));
 
-// sanitize request data
+// Sanitize request data
 app.use(xss());
 
-// gzip compression
+// Gzip compression
 app.use(compression());
 
-// enable cors
+// fingerprinting lowering
+app.disable('x-powered-by');
+
+// Enable cors
 app.use(cors());
 app.options('*', cors());
 
-// jwt authentication
+// Jwt authentication
 app.use(passport.initialize());
 passport.use('jwt', jwtStrategy);
 
-// limit repeated failed requests to auth endpoints
+// Limit repeated failed requests to auth endpoints
 if (config.env === 'production') {
   app.use('/v1/auth', authLimiter);
 }
 
-// v1 api routes
+// V1 api routes
 app.use('/v1', routes);
 
-// send back a 404 error for any unknown api request
+// Send back a 404 error for any unknown api request
 app.use((req, res, next) => {
   next(new ApiError(httpStatus.NOT_FOUND, 'Not found'));
 });
 
-// convert error to ApiError, if needed
+// Convert error to ApiError, if needed
 app.use(errorConverter);
 
-// handle error
+// Handle error
 app.use(errorHandler);
 
 export default app;
