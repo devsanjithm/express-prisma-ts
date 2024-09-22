@@ -1,18 +1,8 @@
-import cron from 'node-cron';
-import deleteExpiredItems from './softDelete.service.js';
-import * as otpService from './otp.service.js';
+import { myQueue } from '../app.js';
 
 const cronJobs = () => {
-  const deleteSoftDeletedItems = cron.schedule('0 0 * * *', () => {
-    deleteExpiredItems();
-  });
-
-  const deleteExpiredOtp = cron.schedule('0 */5 * * *', () => {
-    otpService.cleanExpiredOtp();
-  });
-
-  deleteSoftDeletedItems.start();
-  deleteExpiredOtp.start();
+  myQueue.add('deleteExpiredItems', null, { repeat: { pattern: '0 0 * * *' } });
+  myQueue.add('cleanExpiredOtp', null, { repeat: { pattern: '0 */5 * * *' } });
 };
 
 export default cronJobs;

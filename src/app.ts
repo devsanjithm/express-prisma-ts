@@ -12,9 +12,10 @@ import { errorConverter, errorHandler } from './middlewares/error.js';
 import { authLimiter } from './middlewares/rateLimiter.js';
 import xss from './middlewares/xss.js';
 import routes from './routes/v1/index.js';
-import cronJobs from './services/cron.service.js';
 import ApiError from './utils/ApiError.js';
 import cacheService from './services/cache.service.js';
+import { Queue } from 'bullmq';
+import { startWorker } from './lib/worker.js';
 
 const app = express();
 
@@ -23,13 +24,17 @@ if (config.env !== 'test') {
   app.use(morgan.errorHandler);
 }
 
-// Cron
-if (config.env === 'production') {
-  cronJobs();
-}
-
 //redis
 cacheService.createRedisClient();
+
+// Bullmq
+export const myQueue = new Queue('myQueue', {
+  connection: { url: config.redis.url },
+  defaultJobOptions: {
+    attempts: 5
+  }
+});
+startWorker();
 
 // Set security HTTP headers
 app.use(helmet());
