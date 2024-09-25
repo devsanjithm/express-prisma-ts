@@ -16,6 +16,7 @@ import ApiError from './utils/ApiError.js';
 import cacheService from './services/cache.service.js';
 import { Queue } from 'bullmq';
 import { startWorker } from './lib/worker.js';
+import cronJobs from './services/cron.service.js';
 
 const app = express();
 
@@ -35,6 +36,9 @@ export const myQueue = new Queue('myQueue', {
   }
 });
 startWorker();
+
+// Add jobs
+cronJobs()
 
 // Set security HTTP headers
 app.use(helmet());

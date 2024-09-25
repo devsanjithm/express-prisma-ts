@@ -7,6 +7,7 @@ import { userController } from '../../controllers/user.controller.js';
 const router = express.Router();
 
 router.route('/').post(auth('manage'), validate(userValidation.list), userController.list);
+router.route('/paginate').post(auth('manage'),validate(userValidation.paginate),userController.paginate)
 
 router
   .route('/:user_id')

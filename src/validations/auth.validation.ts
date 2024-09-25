@@ -5,7 +5,7 @@ export const register = {
   body: Joi.object().keys({
     email_address: Joi.string().required().email(),
     password: Joi.string().required().custom(password),
-    member_name: Joi.string().required(),
+    first_name: Joi.string().required(),
     mobile_no: Joi.string()
       .regex(/^[1-9][0-9]{7}$/)
       .messages({ 'string.pattern.base': 'Phone number must have 8 digits.' })
