@@ -26,5 +26,19 @@ export const controller = <M extends ModelName>(service: Service<M>) => ({
   delete: catchAsync(async (req, res) => {
     const data = await service.delete(req.params);
     responseHandler(res, data);
+  }),
+  paginate: catchAsync(async (req, res) => {
+    const { filter, options = {}, include = {}, select = {} } = req.body;
+    const count = await service.count(filter, options, include, select);
+    const data = await service.list(filter, options, include, select);
+    const total_page = Math.ceil(count / options?.limit);
+    const response = {
+      page: options?.page,
+      per_page: options?.limit,
+      total_pages: total_page,
+      total_count: count,
+      result: data
+    };
+    responseHandler(res, response);
   })
 });

@@ -2,7 +2,7 @@ import swaggerAutogen from 'swagger-autogen';
 
 const swaggerDef = {
   info: {
-    title: `AlHayat API documentation`,
+    title: `API documentation`,
     version: '1.0.0',
     license: {
       name: 'MIT'

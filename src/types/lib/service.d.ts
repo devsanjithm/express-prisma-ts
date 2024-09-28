@@ -61,4 +61,14 @@ export interface Service<M extends ModelName> {
     where: whereInput<M>,
     keys?: Key[]
   ): Promise<PrismaModels[M] | null>;
+  count(
+    filter: filterInput,
+    options: {
+      limit?: number;
+      page?: number;
+      sortBy?: OrderByWithAggregationInput;
+    },
+    include?: any,
+    select?: select
+  ): Promise<number>;
 }

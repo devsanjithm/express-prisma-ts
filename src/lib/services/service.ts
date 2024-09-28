@@ -52,8 +52,8 @@ export const service = <M extends ModelName>(model: M) => ({
       payload.select = select;
     }
 
-    const users = await (prisma[model] as any).findMany(payload);
-    return users as Array<PrismaModels[M]>;
+    const data = await (prisma[model] as any).findMany(payload);
+    return data as Array<PrismaModels[M]>;
   },
   update: async <Key extends keyof PrismaModels[M]>(
     where: whereInput<M>,
@@ -74,7 +74,7 @@ export const service = <M extends ModelName>(model: M) => ({
   },
   get: async <Key extends keyof PrismaModels[M]>(
     where: whereInput<M>,
-    keys: Key[] = Object.keys(prisma.users.fields) as Key[]
+    keys: Key[] = Object.keys(prisma[model].fields) as Key[]
   ) => {
     let data = await (prisma[model] as any).findFirst({
       where: where,
@@ -85,5 +85,36 @@ export const service = <M extends ModelName>(model: M) => ({
     }
     data = exclude(data, ['password']);
     return data as PrismaModels[M];
+  },
+  count: async (
+    filter: filterInput<M>,
+    options?: {
+      limit?: number;
+      page?: number;
+      sortBy?: OrderByWithAggregationInput<M>;
+    },
+    include?: any,
+    select?: select<M>
+  ) => {
+    const page = options?.page ?? 0;
+    const limit = options?.limit ?? Number.MAX_SAFE_INTEGER;
+    const sortBy = options?.sortBy;
+    const payload: any = {
+      where: filter,
+      skip: page * limit,
+      take: limit,
+      orderBy: sortBy ? sortBy : undefined
+    };
+
+    if (!R.isEmpty(include)) {
+      payload.include = include;
+    }
+
+    if (!R.isEmpty(select as undefined)) {
+      payload.select = select;
+    }
+
+    const data = await (prisma[model] as any).count(payload);
+    return data;
   }
 });

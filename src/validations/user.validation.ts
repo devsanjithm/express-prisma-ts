@@ -62,3 +62,31 @@ export const deleteData = {
     user_id: Joi.string().required()
   })
 };
+
+export const paginate = {
+  body: Joi.object().keys({
+    filter: Joi.object()
+      .keys({
+        is_active: Joi.boolean()
+      })
+      .required(),
+    select: Joi.object().keys({
+      first_name: Joi.boolean(),
+      last_name: Joi.boolean(),
+      email_address: Joi.boolean(),
+      mobile_number: Joi.boolean(),
+      roles: Joi.boolean(),
+      isEmailVerified: Joi.boolean(),
+      is_active: Joi.boolean(),
+      user_id: Joi.boolean()
+    }),
+    options: Joi.object().keys({
+      sortBy: Joi.string(),
+      limit: Joi.number().integer().required(),
+      page: Joi.number().integer().required()
+    }),
+    include: Joi.object().keys({
+      users: Joi.boolean()
+    })
+  })
+};

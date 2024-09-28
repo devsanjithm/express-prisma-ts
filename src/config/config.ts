@@ -23,9 +23,6 @@ const envVariablesSchema = Joi.object()
       .description('minutes after which verify email token expires'),
     REDIS_URL: Joi.string().description('Redis Url'),
     OTP_EXPIRES: Joi.string().description('OTP EXPIREATION TIME').required(),
-    REAUTHENTICATE_EXPIRY_MINUTES: Joi.number()
-      .default(1)
-      .description('minute after reauthenticate token expiries'),
     SAS_URL: Joi.string().description('Azure sas url'),
     SAS_TOKEN: Joi.string().description('Azure sas token'),
     CONTAINER_NAME: Joi.string().description('Azure container name')
@@ -84,10 +81,6 @@ export default {
     url: envVariables.REDIS_URL
   },
   bullmq: {
-    connector: {
-      host: 'localhost',
-      port: 6379
-    },
     DEFAULT_REMOVE_CONFIG: {
       removeOnComplete: {
         age: 3600

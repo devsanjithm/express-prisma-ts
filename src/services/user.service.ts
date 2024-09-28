@@ -1,7 +1,4 @@
 import { service } from '../lib/services/service.js';
-
-export const userService = service<'users'>('users');
-
 // Example for creating custom get
 
 // const customget = (where: any): any => {
@@ -10,3 +7,8 @@ export const userService = service<'users'>('users');
 // };
 
 // userService.get = customget;
+
+const customServices = {};
+const CRUDServices = service<'users'>('users');
+
+export const userService = { ...customServices, ...CRUDServices };
